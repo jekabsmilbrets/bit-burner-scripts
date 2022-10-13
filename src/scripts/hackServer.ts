@@ -28,7 +28,7 @@ export async function main(
     const currentServerMoney = ns.getServerMoneyAvailable(serverName);
 
     await hackServer(ns, serverName, serverMinSecLvl, serverMaxMoney, currentServerSecLvl, currentServerMoney, threads);
-    await ns.sleep(100);
+    await ns.sleep(500);
   }
 }
 
@@ -51,25 +51,6 @@ async function hackServer(
 ) {
   let script: string;
   let command: string;
-  
-  if (ns.fileExists('NUKE.exe', 'home')) {
-    ns.nuke(serverName);
-  }
-  if (ns.fileExists('BruteSSH.exe', 'home')) {
-    ns.brutessh(serverName);
-  }
-  if (ns.fileExists('FTPCrack.exe', 'home')) {
-    ns.ftpcrack(serverName);
-  }
-  if (ns.fileExists('relaySMTP.exe', 'home')) {
-    ns.relaysmtp(serverName);
-  }
-  if (ns.fileExists('HTTPWorm.exe', 'home')) {
-    ns.httpworm(serverName);
-  }
-  if (ns.fileExists('SQLInject.exe', 'home')) {
-    ns.sqlinject(serverName);
-  }
 
   switch (true) {
     case currentServerSecLvl > serverMinSecLvl:
@@ -107,7 +88,7 @@ async function hackServer(
   while (isScriptRunning) {
     isScriptRunning = ns.isRunning(pid);
 
-    await ns.sleep(100);
+    await ns.sleep(500);
 
     if (!isScriptRunning) {
       let ftime = (new Date()).getTime();
