@@ -1,3 +1,5 @@
+// noinspection GrazieInspection
+
 declare module "Bitburner" {
   /**
    * @public
@@ -4948,6 +4950,7 @@ declare module "Bitburner" {
      * @returns True if specified script is running on the target server, and false otherwise.
      */
     isRunning(script: string, host: string, ...args: string[]): boolean;
+    isRunning(pid: number): boolean;
 
     /**
      * Get general info about a running script.
