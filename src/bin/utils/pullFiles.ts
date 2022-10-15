@@ -1,8 +1,10 @@
-import type {NS} from "Bitburner";
-import {RepoInit} from "/lib/Helpers";
+import { RepoInit } from '/lib/Helpers';
+import { NS }       from 'Bitburner';
 
+
+/** @param {NS} ns */
 export async function main(ns: NS) {
-    const initRepo = new RepoInit(ns);
+  const initRepo = new RepoInit(ns);
 
-    await initRepo.pullScripts();
+  return initRepo.pullScripts();
 }

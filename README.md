@@ -1,11 +1,4 @@
-# BitBurner TypeScript template repo
-
-This is a starter repo for anyone wanting to use TypeScript to play
-BitBurner!
-
-The template relies on a number of things that you can probably change
-to your liking; just be aware you might need to fiddle with settings if
-you change them.
+# BitBurner TypeScript scripts
 
 # Usage
 
@@ -193,6 +186,12 @@ import { Blep } from "/lib/Blep";
 
 which is valid for the game.
 
-# Contributing
+# Useful Alias
 
-Feel free to send PRs!
+Run in terminal before usage
+
+* alias crack="run bin/coordinator.js scan-crack"
+* alias crack-hack="run bin/coordinator.js scan-crack-hack"
+* alias hack="run bin/coordinator.js scan-hack"
+* alias crack-hack-propagate="run bin/coordinator.js scan-crack-hack-propagate"
+
