@@ -1,4 +1,5 @@
-import { NS } from 'Bitburner';
+import { disableLogging } from '/lib/oop/constants/settings.constant';
+import { NS }             from 'Bitburner';
 
 
 const params = {
@@ -22,12 +23,16 @@ async function pullFile(
   file: { sourceFile: string; destFile: string },
 ) {
   const manifestUrl = `${params.baseUrl}${file.sourceFile}`;
-  ns.tprintf(
-    `[${ns.getHostname()}] INFO   > Downloading ${manifestUrl} -> ${file.destFile}`,
-  );
+  if (!disableLogging) {
+    ns.tprintf(
+      `[${ns.getHostname()}] INFO   > Downloading ${manifestUrl} -> ${file.destFile}`,
+    );
+  }
 
   if (!(await ns.wget(manifestUrl, file.destFile))) {
-    ns.tprintf(`[${ns.getHostname()}] ERROR  > ${manifestUrl} -> ${file.destFile} failed.`);
+    if (!disableLogging) {
+      ns.tprintf(`[${ns.getHostname()}] ERROR  > ${manifestUrl} -> ${file.destFile} failed.`);
+    }
     ns.exit();
   }
 }
@@ -44,9 +49,10 @@ export async function main(ns: NS) {
     await pullFile(ns, file);
   }
 
-  ns.tprintf(`[${ns.getHostname()}] INFO   > Successfully pulled initial files!`);
-  ns.tprintf(`[${ns.getHostname()}] INFO   > Running download script...`);
-
+  if (!disableLogging) {
+    ns.tprintf(`[${ns.getHostname()}] INFO   > Successfully pulled initial files!`);
+    ns.tprintf(`[${ns.getHostname()}] INFO   > Running download script...`);
+  }
   await ns.sleep(250);
   ns.run(params.pullFiles.destFile);
 }

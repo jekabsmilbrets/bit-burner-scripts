@@ -36,6 +36,11 @@ export async function main(
       ns.toast(`Action "${action}" got executed`, 'success');
       break;
 
+    case SCRIPTS_TYPES.ScanPropagate:
+      ns.run(EXECUTABLES.Scanner, 1, 'false', 'false', 'true');
+      ns.toast(`Action "${action}" got executed`, 'success');
+      break;
+
     default:
       ns.toast(`Unknown action "${action}"!`, 'error');
       break;

@@ -4,6 +4,7 @@ enum SCRIPTS_TYPES {
   ScanHack = 'scan-hack',
   ScanCrackHack = 'scan-crack-hack',
   ScanCrackHackPropagate = 'scan-crack-hack-propagate',
+  ScanPropagate = 'scan-propagate',
 }
 
 export { SCRIPTS_TYPES };

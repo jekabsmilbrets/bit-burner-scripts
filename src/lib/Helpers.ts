@@ -1,4 +1,5 @@
-import { NS } from 'Bitburner';
+import { disableLogging } from '/lib/oop/constants/settings.constant';
+import { NS }             from 'Bitburner';
 
 const ReadText = {
   readLines(ns: NS, file: string): string[] {
@@ -35,19 +36,27 @@ class TermLogger {
   }
 
   info(msg: string, ...args: string[]) {
-    this.ns.tprintf(`${TermLogger.INFO_LITERAL} ${msg}`, ...args);
+    if (!disableLogging) {
+      this.ns.tprintf(`${TermLogger.INFO_LITERAL} ${msg}`, ...args);
+    }
   }
 
   warn(msg: string, ...args: string[]) {
-    this.ns.tprintf(`${TermLogger.WARN_LITERAL} ${msg}`, ...args);
+    if (!disableLogging) {
+      this.ns.tprintf(`${TermLogger.WARN_LITERAL} ${msg}`, ...args);
+    }
   }
 
   err(msg: string, ...args: string[]) {
-    this.ns.tprintf(`${TermLogger.ERR_LITERAL} ${msg}`, ...args);
+    if (!disableLogging) {
+      this.ns.tprintf(`${TermLogger.ERR_LITERAL} ${msg}`, ...args);
+    }
   }
 
   log(msg: string, ...args: string[]) {
-    this.ns.tprintf(`${TermLogger.TRACE_LITERAL} ${msg}`, ...args);
+    if (!disableLogging) {
+      this.ns.tprintf(`${TermLogger.TRACE_LITERAL} ${msg}`, ...args);
+    }
   }
 }
 
