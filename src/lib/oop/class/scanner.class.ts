@@ -1,8 +1,9 @@
-import { Port }           from '/lib/oop/class/port.class';
-import { EXECUTABLES }    from '/lib/oop/constants/executables.constant';
-import { SCRIPTS }        from '/lib/oop/constants/scripts.constant';
-import { waitForCommand } from '/lib/oop/utils/helper.util';
-import { NS }             from 'Bitburner';
+import { Port }                        from '/lib/oop/class/port.class';
+import { EXECUTABLES }                 from '/lib/oop/enums/executables.enum';
+import { Ports }                       from '/lib/oop/enums/ports.enum';
+import { SCRIPTS }                     from '/lib/oop/enums/scripts.enum';
+import { waitForCommand, disableLogs } from '/lib/oop/utils/helper.util';
+import { NS }                          from 'Bitburner';
 
 
 class Scanner {
@@ -10,9 +11,10 @@ class Scanner {
   private ignoredServerNames: string[] = ['home'];
   private crackedServerNames: string[] = [];
   private hackedServerNames: string[] = [];
-  private propagatedServerNames: string[] = [];
+  private propagatedServerNames: string[] = ['home'];
   private serverNames: string[] = [];
   private hackerLevel: number = 0;
+  private port!: Port;
 
   constructor(
     private ns: NS,
@@ -30,7 +32,6 @@ class Scanner {
     this.ns.killall(this.hostServer);
 
     if (await this.scan()) {
-      this.serverNames = [...this.serverNames].sort();
       this.ns.tprint(`[${this.hostServer}] Scanned servers ${this.serverNames.join(', ')}!`);
     }
 
@@ -40,15 +41,15 @@ class Scanner {
       }
     }
 
-    if (this.doHack) {
-      if (await this.hack()) {
-        this.ns.tprint(`[${this.hostServer}] Hacking initialized in servers (${this.hackedServerNames.join(', ')})!`);
-      }
-    }
-
     if (this.doPropagate) {
       if (await this.propagate()) {
         this.ns.tprint(`[${this.hostServer}] Propagate initialized in servers (${this.propagatedServerNames.join(', ')})!`);
+      }
+    }
+
+    if (this.doHack) {
+      if (await this.hack()) {
+        this.ns.tprint(`[${this.hostServer}] Hacking initialized in servers (${this.hackedServerNames.join(', ')})!`);
       }
     }
   }
@@ -67,13 +68,17 @@ class Scanner {
 
       if (foundServerNames.length > 0) {
         this.serverNames = [
-          ...this.serverNames,
-          ...foundServerNames,
+          ...new Set(
+            [
+              ...this.serverNames,
+              ...foundServerNames,
+            ],
+          ),
         ];
 
-        await this.scan();
-
         await this.ns.sleep(this.sleepTime);
+      } else {
+        break;
       }
     }
 
@@ -82,7 +87,11 @@ class Scanner {
 
   private async crack(): Promise<boolean> {
     for (const serverName of this.serverNames) {
-      const pid = this.ns.run(EXECUTABLES.Cracker, 1, serverName);
+      const pid = this.ns.run(
+        EXECUTABLES.Cracker,
+        1,
+        serverName,
+      );
 
       await waitForCommand(
         this.ns,
@@ -145,11 +154,16 @@ class Scanner {
   }
 
   private async propagate(): Promise<boolean> {
-    const port = new Port(this.ns);
-    const portHandler = port.getPort(1);
+    const portHandler = this.port.getPort(Ports.Propagate);
+
+    const getPropagatedServers = (method: 'read' | 'peek') => {
+      const action = (method): string => method === 'read' ? portHandler.read() as string : portHandler.peek() as string;
+
+      return !portHandler.empty() ? action(method).split(',') : [];
+    };
 
     for (const serverName of this.serverNames) {
-      let propagatedServers = !portHandler.empty() ? (portHandler.peek() as string).split(',') : [];
+      let propagatedServers = getPropagatedServers('peek');
 
       if (propagatedServers.includes(serverName)) {
         continue;
@@ -173,12 +187,15 @@ class Scanner {
 
         this.propagatedServerNames.push(serverName);
 
-        propagatedServers = !portHandler.empty() ? (portHandler.read() as string).split(',') : [];
+        propagatedServers = getPropagatedServers('read');
         propagatedServers = [
-          ...propagatedServers,
-          ...this.propagatedServerNames,
+          ...new Set(
+            [
+              ...propagatedServers,
+              ...this.propagatedServerNames,
+            ],
+          ),
         ];
-        propagatedServers = [...new Set(propagatedServers)];
 
         portHandler.write(propagatedServers.join(','));
       }
@@ -188,20 +205,26 @@ class Scanner {
   }
 
   private init(): void {
-    this.ns.disableLog('disableLog');
-    this.ns.disableLog('getHackingLevel');
-    this.ns.disableLog('getHostname');
-    this.ns.disableLog('getServerRequiredHackingLevel');
-    this.ns.disableLog('hasRootAccess');
-    this.ns.disableLog('isRunning');
-    this.ns.disableLog('run');
-    this.ns.disableLog('serverExists');
-    this.ns.disableLog('sleep');
-    this.ns.disableLog('toast');
+    disableLogs(
+      this.ns,
+      [
+        'disableLog',
+        'getHackingLevel',
+        'getHostname',
+        'getServerRequiredHackingLevel',
+        'hasRootAccess',
+        'isRunning',
+        'run',
+        'serverExists',
+        'sleep',
+        'toast',
+      ],
+    );
 
     this.hostServer = this.ns.getHostname();
     this.ignoredServerNames.push(this.hostServer);
     this.hackerLevel = this.ns.getHackingLevel();
+    this.port = new Port(this.ns);
 
     this.serverNames = this.ns.scan(this.hostServer)
                            .filter(

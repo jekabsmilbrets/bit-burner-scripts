@@ -42,4 +42,32 @@ function hasArg(
   return defaultValue;
 }
 
-export { waitForCommand, hasArg };
+function disableLogs(
+  ns: NS,
+  fns: string[],
+): void {
+  fns.forEach(
+    (fn: string) => {
+      ns.print(`Disabling logs for ${fn}`);
+      ns.disableLog(fn);
+    },
+  );
+}
+
+async function dynamicAsyncMethodCall(
+  self: any,
+  method: string,
+  args?: any | any[],
+): Promise<any> {
+  if (args) {
+    if (Array.isArray(args)) {
+      return self[method](...args);
+    }
+
+    return self[method](args);
+  }
+
+  return self[method]();
+}
+
+export { waitForCommand, hasArg, disableLogs, dynamicAsyncMethodCall };

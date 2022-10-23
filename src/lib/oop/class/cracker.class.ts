@@ -1,7 +1,19 @@
-import { NS } from 'Bitburner';
+import { disableLogs, dynamicAsyncMethodCall } from '/lib/oop/utils/helper.util';
+import { NS }                                  from 'Bitburner';
 
 
 class Cracker {
+  private methods: string[] = [
+    'NUKE',
+    'BruteSSH',
+    'FTPCrack',
+    'relaySMTP',
+    'HTTPWorm',
+    'SQLInject',
+  ];
+
+  private successfulCracks = 0;
+
   constructor(
     private ns: NS,
     private serverName: string,
@@ -12,15 +24,18 @@ class Cracker {
   }
 
   public async run(): Promise<void> {
-    await this.NUKE();
-    await this.BruteSSH();
-    await this.FTPCrack();
-    await this.relaySMTP();
-    await this.HTTPWorm();
-    await this.SQLInject();
+    for (const method of this.methods) {
+      if ((await dynamicAsyncMethodCall(this, method)) === true) {
+        this.successfulCracks++;
+      }
+    }
+
+    if (this.successfulCracks === this.methods.length) {
+      this.ns.toast(`All Cracks (${this.methods.join(', ')}) executed on ${this.serverName}!`);
+    }
   }
 
-  private async NUKE(): Promise<void> {
+  private async NUKE(): Promise<boolean> {
     try {
       if (this.ns.fileExists('NUKE.exe', 'home')) {
         this.ns.nuke(this.serverName);
@@ -34,10 +49,14 @@ class Cracker {
       if (this.toast) {
         this.ns.toast(`Failed to executed NUKE.exe on ${this.serverName}!`, 'error');
       }
+
+      return false;
     }
+
+    return true;
   }
 
-  private async BruteSSH(): Promise<void> {
+  private async BruteSSH(): Promise<boolean> {
     try {
       if (this.ns.fileExists('BruteSSH.exe', 'home')) {
         this.ns.brutessh(this.serverName);
@@ -51,10 +70,14 @@ class Cracker {
       if (this.toast) {
         this.ns.toast(`Failed to executed BruteSSH.exe on ${this.serverName}!`, 'error');
       }
+
+      return false;
     }
+
+    return true;
   }
 
-  private async FTPCrack(): Promise<void> {
+  private async FTPCrack(): Promise<boolean> {
     try {
       if (this.ns.fileExists('FTPCrack.exe', 'home')) {
         this.ns.ftpcrack(this.serverName);
@@ -68,10 +91,14 @@ class Cracker {
       if (this.toast) {
         this.ns.toast(`Failed to executed FTPCrack.exe on ${this.serverName}!`, 'error');
       }
+
+      return false;
     }
+
+    return true;
   }
 
-  private async relaySMTP(): Promise<void> {
+  private async relaySMTP(): Promise<boolean> {
     try {
       if (this.ns.fileExists('relaySMTP.exe', 'home')) {
         this.ns.relaysmtp(this.serverName);
@@ -85,10 +112,14 @@ class Cracker {
       if (this.toast) {
         this.ns.toast(`Failed to executed relaySMTP.exe on ${this.serverName}!`, 'error');
       }
+
+      return false;
     }
+
+    return true;
   }
 
-  private async HTTPWorm(): Promise<void> {
+  private async HTTPWorm(): Promise<boolean> {
     try {
       if (this.ns.fileExists('HTTPWorm.exe', 'home')) {
         this.ns.httpworm(this.serverName);
@@ -102,10 +133,14 @@ class Cracker {
       if (this.toast) {
         this.ns.toast(`Failed to executed HTTPWorm.exe on ${this.serverName}!`, 'error');
       }
+
+      return false;
     }
+
+    return true;
   }
 
-  private async SQLInject(): Promise<void> {
+  private async SQLInject(): Promise<boolean> {
     try {
       if (this.ns.fileExists('SQLInject.exe', 'home')) {
         this.ns.sqlinject(this.serverName);
@@ -119,20 +154,29 @@ class Cracker {
       if (this.toast) {
         this.ns.toast(`Failed to executed SQLInject.exe on ${this.serverName}!`, 'error');
       }
+
+      return false;
     }
+
+    return true;
   }
 
   private init(): void {
-    this.ns.disableLog('brutessh');
-    this.ns.disableLog('disableLog');
-    this.ns.disableLog('fileExists');
-    this.ns.disableLog('ftpcrack');
-    this.ns.disableLog('httpworm');
-    this.ns.disableLog('nuke');
-    this.ns.disableLog('relaysmtp');
-    this.ns.disableLog('sleep');
-    this.ns.disableLog('sqlinject');
-    this.ns.disableLog('toast');
+    disableLogs(
+      this.ns,
+      [
+        'disableLog',
+        'brutessh',
+        'fileExists',
+        'ftpcrack',
+        'httpworm',
+        'nuke',
+        'relaysmtp',
+        'sleep',
+        'sqlinject',
+        'toast',
+      ],
+    );
   }
 }
 

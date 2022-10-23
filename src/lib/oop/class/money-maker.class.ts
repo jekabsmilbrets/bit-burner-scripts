@@ -1,5 +1,6 @@
-import { SCRIPTS } from '/lib/oop/constants/scripts.constant';
-import { NS }      from 'Bitburner';
+import { SCRIPTS }                     from '/lib/oop/enums/scripts.enum';
+import { disableLogs, waitForCommand } from '/lib/oop/utils/helper.util';
+import { NS }                          from 'Bitburner';
 
 class MoneyMaker {
   private serverMinSecLvl!: number;
@@ -57,9 +58,13 @@ class MoneyMaker {
       this.serverName,
     );
 
-    await this.waitForCommand(
+    await waitForCommand(
+      this.ns,
+      this.serverName,
       command,
       pid,
+      this.sleepTime,
+      this.toast,
     );
 
     return true;
@@ -110,44 +115,24 @@ class MoneyMaker {
     return this.hostServerMaxRam - serverUsedRam >= scriptRam;
   }
 
-  private async waitForCommand(
-    command: string,
-    pid: number,
-  ): Promise<void> {
-    const time = (new Date()).getTime();
-    let isScriptRunning = true;
-
-    while (isScriptRunning) {
-      isScriptRunning = this.ns.isRunning(pid);
-
-      if (!isScriptRunning) {
-        const fTime = (new Date()).getTime();
-        const message = `Finished command ${command} on server ${this.serverName} in ${(fTime - time) / 1000} seconds`;
-        this.ns.print(message);
-
-        if (this.toast) {
-          this.ns.toast(message, 'success');
-        }
-
-        break;
-      }
-
-      await this.ns.sleep(this.sleepTime);
-    }
-  }
-
   private init(): void {
-    this.ns.disableLog('disableLog');
-    this.ns.disableLog('getHostname');
-    this.ns.disableLog('getScriptRam');
-    this.ns.disableLog('getServerMoneyAvailable');
-    this.ns.disableLog('getServerSecurityLevel');
-    this.ns.disableLog('getServerUsedRam');
-    this.ns.disableLog('isRunning');
-    this.ns.disableLog('print');
-    this.ns.disableLog('run');
-    this.ns.disableLog('sleep');
-    this.ns.disableLog('toast');
+    disableLogs(
+      this.ns,
+      [
+        'disableLog',
+        'getHostname',
+        'getScriptRam',
+        'getServerMoneyAvailable',
+        'getServerSecurityLevel',
+        'getServerUsedRam',
+        'isRunning',
+        'print',
+        'run',
+        'sleep',
+        'toast',
+      ],
+    );
+
     this.hostServer = this.ns.getHostname();
     this.hostServerMaxRam = this.ns.getServerMaxRam(this.hostServer);
 

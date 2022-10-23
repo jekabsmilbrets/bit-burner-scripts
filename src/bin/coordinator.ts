@@ -1,5 +1,5 @@
-import { EXECUTABLES }   from '/lib/oop/constants/executables.constant';
-import { SCRIPTS_TYPES } from '/lib/oop/constants/script-types.constant';
+import { EXECUTABLES }   from '/lib/oop/enums/executables.enum';
+import { SCRIPTS_TYPES } from '/lib/oop/enums/script-types.enum';
 import { hasArg }        from '/lib/oop/utils/helper.util';
 import { NS }            from 'Bitburner';
 

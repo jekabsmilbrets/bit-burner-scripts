@@ -1,11 +1,13 @@
-import { EXECUTABLES }   from '/lib/oop/constants/executables.constant';
-import { SCRIPTS_TYPES } from '/lib/oop/constants/script-types.constant';
+import { EXECUTABLES }   from '/lib/oop/enums/executables.enum';
+import { SCRIPTS_TYPES } from '/lib/oop/enums/script-types.enum';
 import { NS }            from 'Bitburner';
 
 
 /** @param {NS} ns */
 export async function main(ns: NS) {
   const serverName: string = ns.args[0] as string;
+
+  ns.killall(serverName);
 
   const fileDownloaded = await ns.wget(
     'http://localhost:9182/bin/utils/initRepo.js',

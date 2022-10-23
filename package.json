@@ -1,4 +1,9 @@
 {
+  "author": {
+    "name": "Jēkabs Milbrets",
+    "email": "jekabs.milbrets@me.com"
+  },
+  "version": "0.0.4",
   "scripts": {
     "build": "npm-run-all buildTs copyResources buildManifest",
     "buildTs": "tsc -p tsconfig.json",
